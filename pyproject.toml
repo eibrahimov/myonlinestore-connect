@@ -39,5 +39,19 @@ dev = [
     "respx>=0.21",
 ]
 
+[tool.hatch.build]
+exclude = [
+    "/.venv/",
+    "/.venv-*/",
+    "/venv/",
+    "/env/",
+    "/dist/",
+    "/build/",
+    "/.pytest_cache/",
+    "/.mypy_cache/",
+    "/.ruff_cache/",
+    "/__pycache__/",
+]
+
 [tool.hatch.build.targets.wheel]
 packages = ["myonlinestore"]
