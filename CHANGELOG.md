@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2026-03-27
+
+### Changed
+
+- Improved package metadata with author/contact details, license file declarations, issues and changelog links, and dynamic installed-version resolution.
+- Added stronger packaging validation in CI, including wheel and source distribution smoke tests before release.
+- Added trusted publishing workflows for TestPyPI and PyPI with Sigstore attestations.
+- Added repository security automation with Dependabot, `pip-audit`, `bandit`, and a published security policy.
+- Clarified install-vs-import naming in the README and added project badges.
+
 ## [1.0.0] - 2026-03-27
 
 ### Added
@@ -103,4 +113,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Type safety via PEP 561 `py.typed` marker for mypy and other type checkers
 - Structured validation via Pydantic v2 to prevent injection attacks
 
-[1.0.0]: https://github.com/eibrahimov/myonlinestore-connect/tree/v1.0.0
+[1.0.1]: https://github.com/eibrahimov/myonlinestore-connect/compare/v1.0.0...v1.0.1
+[1.0.0]: https://github.com/eibrahimov/myonlinestore-connect/releases/tag/v1.0.0
