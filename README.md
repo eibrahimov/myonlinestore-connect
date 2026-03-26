@@ -1,11 +1,25 @@
 # MyOnlineStore Connect API — Python Client
 
+[![PyPI version](https://img.shields.io/pypi/v/myonlinestore-connect.svg)](https://pypi.org/project/myonlinestore-connect/)
+[![Python versions](https://img.shields.io/pypi/pyversions/myonlinestore-connect.svg)](https://pypi.org/project/myonlinestore-connect/)
+[![CI](https://github.com/eibrahimov/myonlinestore-connect/actions/workflows/python-package.yml/badge.svg?branch=main)](https://github.com/eibrahimov/myonlinestore-connect/actions/workflows/python-package.yml)
+[![License](https://img.shields.io/pypi/l/myonlinestore-connect.svg)](https://github.com/eibrahimov/myonlinestore-connect/blob/main/LICENSE)
+
 A typed Python SDK for the [MyOnlineStore Connect API](https://connect.myonlinestore.com/), providing sync and async access to all API endpoints with Pydantic-validated models.
+
+> **PyPI package name:** `myonlinestore-connect`
+> **Python import name:** `myonlinestore`
 
 ## Installation
 
 ```bash
 pip install myonlinestore-connect
+```
+
+Then import it in Python with:
+
+```python
+import myonlinestore
 ```
 
 Or install from source:

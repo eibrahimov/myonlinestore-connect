@@ -9,11 +9,16 @@ description = "Python client SDK for the MyOnlineStore Connect API"
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
+authors = [
+    { name = "Edgar Ibrahimov", email = "eibrahimov@gmail.com" },
+]
+license-files = ["LICENSE"]
 keywords = ["myonlinestore", "ecommerce", "api", "sdk", "client"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -31,6 +36,8 @@ dependencies = [
 Homepage = "https://connect.myonlinestore.com/"
 Documentation = "https://connect.myonlinestore.com/swagger-docs"
 Repository = "https://github.com/eibrahimov/myonlinestore-connect"
+Issues = "https://github.com/eibrahimov/myonlinestore-connect/issues"
+Changelog = "https://github.com/eibrahimov/myonlinestore-connect/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 dev = [
