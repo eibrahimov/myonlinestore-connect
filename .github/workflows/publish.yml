@@ -1,10 +1,9 @@
-name: Publish to PyPI
+name: Publish package
 
 on:
   push:
     tags:
       - "v*"
-  workflow_dispatch:
 
 permissions:
   contents: read
@@ -14,10 +13,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6.0.2
 
       - name: Set up Python 3.13
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6.2.0
         with:
           python-version: "3.13"
 
@@ -30,15 +29,42 @@ jobs:
           python -m twine check dist/*
 
       - name: Upload distributions
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: python-package-distributions
           path: dist/
 
-  publish:
+  publish-testpypi:
+    name: Publish to TestPyPI
     needs: build
     runs-on: ubuntu-latest
     permissions:
+      contents: read
+      id-token: write
+
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/project/myonlinestore-connect/
+
+    steps:
+      - name: Download distributions
+        uses: actions/download-artifact@v4.3.0
+        with:
+          name: python-package-distributions
+          path: dist/
+
+      - name: Publish to TestPyPI via trusted publishing
+        uses: pypa/gh-action-pypi-publish@v1.13.0
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          skip-existing: true
+
+  publish-pypi:
+    name: Publish to PyPI
+    needs: [build, publish-testpypi]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
       id-token: write
 
     environment:
@@ -47,10 +73,10 @@ jobs:
 
     steps:
       - name: Download distributions
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v4.3.0
         with:
           name: python-package-distributions
           path: dist/
 
       - name: Publish to PyPI via trusted publishing
-        uses: pypa/gh-action-pypi-publish@release/v1
+        uses: pypa/gh-action-pypi-publish@v1.13.0
