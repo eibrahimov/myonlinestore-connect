@@ -23,7 +23,11 @@ class NewsletterResource(Resource):
         limit: int | None = None,
         offset: int | None = None,
         activated: bool | None = None,
-        activate: bool | None = None,
+        created_start_date: str | None = None,
+        created_end_date: str | None = None,
+        changed_start_date: str | None = None,
+        changed_end_date: str | None = None,
+        **legacy_filters: Any,
     ) -> PaginatedResponse[NewsletterSubscriber]:
         """List newsletter subscribers.
 
@@ -36,8 +40,20 @@ class NewsletterResource(Resource):
         Returns:
             PaginatedResponse containing NewsletterSubscriber objects
         """
+        activate = legacy_filters.pop("activate", None)
+        if legacy_filters:
+            unexpected = ", ".join(sorted(legacy_filters))
+            raise TypeError(f"Unexpected keyword argument(s): {unexpected}")
+        if activated is None and activate is not None:
+            activated = activate
         params = self._list_params(
-            limit, offset, activated=activated, activate=activate
+            limit,
+            offset,
+            activated=activated,
+            created_start_date=created_start_date,
+            created_end_date=created_end_date,
+            changed_start_date=changed_start_date,
+            changed_end_date=changed_end_date,
         )
         data = self._transport.get("/newsletter/subscribers", params=params)
         items = [NewsletterSubscriber.model_validate(item) for item in (data or [])]
@@ -49,7 +65,11 @@ class NewsletterResource(Resource):
         limit: int | None = None,
         offset: int | None = None,
         activated: bool | None = None,
-        activate: bool | None = None,
+        created_start_date: str | None = None,
+        created_end_date: str | None = None,
+        changed_start_date: str | None = None,
+        changed_end_date: str | None = None,
+        **legacy_filters: Any,
     ) -> PaginatedResponse[NewsletterSubscriber]:
         """Asynchronously list newsletter subscribers.
 
@@ -62,8 +82,20 @@ class NewsletterResource(Resource):
         Returns:
             PaginatedResponse containing NewsletterSubscriber objects
         """
+        activate = legacy_filters.pop("activate", None)
+        if legacy_filters:
+            unexpected = ", ".join(sorted(legacy_filters))
+            raise TypeError(f"Unexpected keyword argument(s): {unexpected}")
+        if activated is None and activate is not None:
+            activated = activate
         params = self._list_params(
-            limit, offset, activated=activated, activate=activate
+            limit,
+            offset,
+            activated=activated,
+            created_start_date=created_start_date,
+            created_end_date=created_end_date,
+            changed_start_date=changed_start_date,
+            changed_end_date=changed_end_date,
         )
         data = await self._transport.aget("/newsletter/subscribers", params=params)
         items = [NewsletterSubscriber.model_validate(item) for item in (data or [])]
@@ -93,22 +125,56 @@ class NewsletterResource(Resource):
         data = await self._transport.apost("/newsletter/subscribers", json=body)
         return NewsletterSubscriber.model_validate(data)
 
-    def count(self) -> int:
+    def count(
+        self,
+        *,
+        activated: bool | None = None,
+        created_start_date: str | None = None,
+        created_end_date: str | None = None,
+        changed_start_date: str | None = None,
+        changed_end_date: str | None = None,
+    ) -> int:
         """Get the total count of newsletter subscribers.
 
         Returns:
             Total number of subscribers.
         """
-        data = self._transport.get("/newsletter/subscribers/count")
+        params = self._list_params(
+            None,
+            None,
+            activated=activated,
+            created_start_date=created_start_date,
+            created_end_date=created_end_date,
+            changed_start_date=changed_start_date,
+            changed_end_date=changed_end_date,
+        )
+        data = self._transport.get("/newsletter/subscribers/count", params=params)
         return CountResponse.model_validate(data).count
 
-    async def acount(self) -> int:
+    async def acount(
+        self,
+        *,
+        activated: bool | None = None,
+        created_start_date: str | None = None,
+        created_end_date: str | None = None,
+        changed_start_date: str | None = None,
+        changed_end_date: str | None = None,
+    ) -> int:
         """Asynchronously get the total count of newsletter subscribers.
 
         Returns:
             Total number of subscribers.
         """
-        data = await self._transport.aget("/newsletter/subscribers/count")
+        params = self._list_params(
+            None,
+            None,
+            activated=activated,
+            created_start_date=created_start_date,
+            created_end_date=created_end_date,
+            changed_start_date=changed_start_date,
+            changed_end_date=changed_end_date,
+        )
+        data = await self._transport.aget("/newsletter/subscribers/count", params=params)
         return CountResponse.model_validate(data).count
 
     def get(self, *, email: str) -> NewsletterSubscriber:

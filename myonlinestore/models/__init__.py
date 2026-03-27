@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from typing import Any, Optional
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class _ConnectModel(BaseModel):
@@ -83,6 +83,13 @@ class OrderPrice(_ConnectModel):
 
     total: Optional[str] = None
     """Total order price"""
+
+    @field_validator("tax", mode="before")
+    @classmethod
+    def _coerce_single_tax_to_list(cls, value: Any) -> Any:
+        if isinstance(value, dict):
+            return [value]
+        return value
 
 
 # ============================================================================
@@ -478,6 +485,13 @@ class OrderShipping(_ConnectModel):
     country: Optional[OrderShippingCountry] = None
     """Shipping destination country"""
 
+    @field_validator("country", mode="before")
+    @classmethod
+    def _empty_country_list_to_none(cls, value: Any) -> Any:
+        if value == []:
+            return None
+        return value
+
 
 class OrderDebtor(_ConnectModel):
     """Order debtor (customer) information.
@@ -515,6 +529,18 @@ class OrderDebtor(_ConnectModel):
     """Invoice and delivery addresses"""
 
 
+class OrderPaymentStatus(_ConnectModel):
+    """Order payment status details."""
+
+    model_config = ConfigDict(populate_by_name=True, extra="ignore")
+
+    id: Optional[int] = None
+    """Numeric payment status code"""
+
+    text: Optional[str] = None
+    """Human-readable payment status"""
+
+
 class OrderPaymentSummary(_ConnectModel):
     """Order payment summary.
 
@@ -529,7 +555,7 @@ class OrderPaymentSummary(_ConnectModel):
     method_name: Optional[str] = None
     """Payment method name"""
 
-    status: Optional[str] = None
+    status: Optional[OrderPaymentStatus] = None
     """Payment status"""
 
 
@@ -541,7 +567,7 @@ class OrderDetail(_ConnectModel):
 
     model_config = ConfigDict(populate_by_name=True, extra="ignore")
 
-    id: Optional[int] = None
+    id: Optional[str] = None
     """Item identifier"""
 
     type: Optional[str] = None
@@ -562,8 +588,15 @@ class OrderDetail(_ConnectModel):
     description: Optional[str] = None
     """Item description"""
 
-    price: Optional[str] = None
+    price: Optional[TaxPrice | list[TaxPrice]] = None
     """Total price for this item"""
+
+    @field_validator("price", mode="before")
+    @classmethod
+    def _coerce_single_price(cls, value: Any) -> Any:
+        if isinstance(value, dict):
+            return TaxPrice.model_validate(value)
+        return value
 
 
 class OrderStatus(_ConnectModel):
@@ -592,7 +625,7 @@ class Order(_ConnectModel):
 
     model_config = ConfigDict(populate_by_name=True, extra="ignore")
 
-    number: Optional[int] = None
+    number: Optional[str] = None
     """Order number"""
 
     uuid: Optional[str] = None
@@ -640,7 +673,7 @@ class Order(_ConnectModel):
     credited_order_number: Optional[int] = None
     """If this is a credit order, the original order number"""
 
-    credit_order_numbers: Optional[list[int]] = None
+    credit_order_numbers: Optional[list[str | int]] = None
     """Order numbers of any credit orders created from this order"""
 
     comments: Optional[OrderComment] = None
@@ -1081,7 +1114,7 @@ class OfflineLocation(_ConnectModel):
 
     model_config = ConfigDict(populate_by_name=True, extra="ignore")
 
-    id: Optional[int] = None
+    id: Optional[str] = None
     """Location identifier"""
 
     name: Optional[str] = None
@@ -1126,7 +1159,7 @@ class ShippingMethod(_ConnectModel):
 
     model_config = ConfigDict(populate_by_name=True, extra="ignore")
 
-    id: Optional[int] = None
+    id: Optional[str] = None
     """Shipping method identifier"""
 
     display_name: Optional[str] = None
@@ -1150,7 +1183,7 @@ class Store(_ConnectModel):
 
     model_config = ConfigDict(populate_by_name=True, extra="ignore")
 
-    id: Optional[int] = None
+    id: Optional[str] = None
     """Store identifier"""
 
     name: Optional[str] = None
@@ -1186,7 +1219,7 @@ class Store(_ConnectModel):
     active_languages: Optional[list[str]] = None
     """Active languages in the store"""
 
-    available_business_models: Optional[list[str]] = None
+    available_business_models: Optional[str] = None
     """Available business models"""
 
     currency_format_locale: Optional[str] = None
@@ -1279,6 +1312,7 @@ __all__ = [
     "OrderDebtor",
     "OrderShippingCountry",
     "OrderShipping",
+    "OrderPaymentStatus",
     "OrderPaymentSummary",
     "OrderDetail",
     "Order",

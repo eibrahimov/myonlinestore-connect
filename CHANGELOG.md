@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+## [1.0.2] - 2026-03-27
+
+### Fixed
+
+- Aligned SDK GET parsing with real MyOnlineStore live API responses for store, order, tax policy, shipping method, and related models.
+- Fixed `store.get()` parsing for live UUID store IDs and string `available_business_models` values.
+- Fixed `orders.list()` and `orders.get()` parsing for live order payload shapes, including string order numbers, nested payment status objects, single-tax-object responses, UUID order line IDs, and live shipping country edge cases.
+- Fixed `tax_policy.list()` parsing for the live wrapped response shape (`{"regions": [...]}`).
+
+### Changed
+
+- Tightened SDK model types to align with the locally patched live-observed OpenAPI for the audited GET surface.
+- Expanded GET parameter coverage to better match the published API surface, including article count filters, category filters, discount code filters, newsletter filters, offline location filters, order date aliases, ordering, and payment listing embed support.
+- Normalized primary SDK parameter names to match OpenAPI where possible while preserving backward-compatible aliases.
+- Added compatibility handling and tests for legacy parameter names where retained.
+- Added GET-only live schema analysis, type inventory reports, and a locally patched OpenAPI derived from observed live responses.
+
+### Documentation
+
+- Documented the gap between the vendor OpenAPI and the real live API through generated comparison reports.
+- Added a live-patched OpenAPI artifact for local validation against the SDK.
+
 ## [1.0.1] - 2026-03-27
 
 ### Changed
@@ -113,5 +137,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Type safety via PEP 561 `py.typed` marker for mypy and other type checkers
 - Structured validation via Pydantic v2 to prevent injection attacks
 
+[Unreleased]: https://github.com/eibrahimov/myonlinestore-connect/compare/v1.0.2...HEAD
+[1.0.2]: https://github.com/eibrahimov/myonlinestore-connect/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/eibrahimov/myonlinestore-connect/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/eibrahimov/myonlinestore-connect/releases/tag/v1.0.0

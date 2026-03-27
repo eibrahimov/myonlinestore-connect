@@ -162,48 +162,70 @@ class OfflineLocationsResource(Resource):
     def __init__(self, transport: HttpTransport) -> None:
         super().__init__(transport)
 
-    def list(self) -> PaginatedResponse[OfflineLocation]:
+    def list(self, *, deleted: bool | None = None) -> PaginatedResponse[OfflineLocation]:
         """List offline locations.
 
         Returns:
             PaginatedResponse containing OfflineLocation objects
         """
-        data = self._transport.get("/offlinelocations")
+        params = self._list_params(None, None, deleted=deleted)
+        data = self._transport.get("/offlinelocations", params=params)
         items = [OfflineLocation.model_validate(item) for item in (data or [])]
         return PaginatedResponse(items=items, limit=50, offset=0)
 
-    async def alist(self) -> PaginatedResponse[OfflineLocation]:
+    async def alist(self, *, deleted: bool | None = None) -> PaginatedResponse[OfflineLocation]:
         """Asynchronously list offline locations.
 
         Returns:
             PaginatedResponse containing OfflineLocation objects
         """
-        data = await self._transport.aget("/offlinelocations")
+        params = self._list_params(None, None, deleted=deleted)
+        data = await self._transport.aget("/offlinelocations", params=params)
         items = [OfflineLocation.model_validate(item) for item in (data or [])]
         return PaginatedResponse(items=items, limit=50, offset=0)
 
-    def get(self, *, location_id: int | str) -> OfflineLocation:
+    def get(self, *, id: int | str | None = None, **kwargs: Any) -> OfflineLocation:
         """Get an offline location by ID.
 
         Args:
-            location_id: The location ID
+            id: The location ID
 
         Returns:
             OfflineLocation object
         """
-        data = self._transport.get(f"/offlinelocations/{location_id}")
+        location_id = kwargs.pop("location_id", None)
+        if kwargs:
+            unexpected = ", ".join(sorted(kwargs))
+            raise TypeError(f"Unexpected keyword argument(s): {unexpected}")
+        if id is None:
+            id = location_id
+        elif location_id is not None and location_id != id:
+            raise TypeError("Pass either id= or location_id=, not both")
+        if id is None:
+            raise TypeError("Missing required argument: id")
+        data = self._transport.get(f"/offlinelocations/{id}")
         return OfflineLocation.model_validate(data)
 
-    async def aget(self, *, location_id: int | str) -> OfflineLocation:
+    async def aget(self, *, id: int | str | None = None, **kwargs: Any) -> OfflineLocation:
         """Asynchronously get an offline location by ID.
 
         Args:
-            location_id: The location ID
+            id: The location ID
 
         Returns:
             OfflineLocation object
         """
-        data = await self._transport.aget(f"/offlinelocations/{location_id}")
+        location_id = kwargs.pop("location_id", None)
+        if kwargs:
+            unexpected = ", ".join(sorted(kwargs))
+            raise TypeError(f"Unexpected keyword argument(s): {unexpected}")
+        if id is None:
+            id = location_id
+        elif location_id is not None and location_id != id:
+            raise TypeError("Pass either id= or location_id=, not both")
+        if id is None:
+            raise TypeError("Missing required argument: id")
+        data = await self._transport.aget(f"/offlinelocations/{id}")
         return OfflineLocation.model_validate(data)
 
 
@@ -220,7 +242,8 @@ class TaxPolicyResource(Resource):
             PaginatedResponse containing TaxPolicyRegion objects
         """
         data = self._transport.get("/tax-policy/regions")
-        items = [TaxPolicyRegion.model_validate(item) for item in (data or [])]
+        raw_items = self._unwrap_list(data, "regions")
+        items = [TaxPolicyRegion.model_validate(item) for item in raw_items]
         return PaginatedResponse(items=items, limit=50, offset=0)
 
     async def alist(self) -> PaginatedResponse[TaxPolicyRegion]:
@@ -230,7 +253,8 @@ class TaxPolicyResource(Resource):
             PaginatedResponse containing TaxPolicyRegion objects
         """
         data = await self._transport.aget("/tax-policy/regions")
-        items = [TaxPolicyRegion.model_validate(item) for item in (data or [])]
+        raw_items = self._unwrap_list(data, "regions")
+        items = [TaxPolicyRegion.model_validate(item) for item in raw_items]
         return PaginatedResponse(items=items, limit=50, offset=0)
 
     def get(self, *, code: str) -> TaxPolicyRegion:
@@ -323,28 +347,48 @@ class ArticleListsResource(Resource):
     def __init__(self, transport: HttpTransport) -> None:
         super().__init__(transport)
 
-    def get(self, *, list_id: int | str) -> ArticleList:
+    def get(self, *, id: int | str | None = None, **kwargs: Any) -> ArticleList:
         """Get an article list by ID.
 
         Args:
-            list_id: The article list ID
+            id: The article list ID
 
         Returns:
             ArticleList object
         """
-        data = self._transport.get(f"/articlelists/{list_id}")
+        list_id = kwargs.pop("list_id", None)
+        if kwargs:
+            unexpected = ", ".join(sorted(kwargs))
+            raise TypeError(f"Unexpected keyword argument(s): {unexpected}")
+        if id is None:
+            id = list_id
+        elif list_id is not None and list_id != id:
+            raise TypeError("Pass either id= or list_id=, not both")
+        if id is None:
+            raise TypeError("Missing required argument: id")
+        data = self._transport.get(f"/articlelists/{id}")
         return ArticleList.model_validate(data)
 
-    async def aget(self, *, list_id: int | str) -> ArticleList:
+    async def aget(self, *, id: int | str | None = None, **kwargs: Any) -> ArticleList:
         """Asynchronously get an article list by ID.
 
         Args:
-            list_id: The article list ID
+            id: The article list ID
 
         Returns:
             ArticleList object
         """
-        data = await self._transport.aget(f"/articlelists/{list_id}")
+        list_id = kwargs.pop("list_id", None)
+        if kwargs:
+            unexpected = ", ".join(sorted(kwargs))
+            raise TypeError(f"Unexpected keyword argument(s): {unexpected}")
+        if id is None:
+            id = list_id
+        elif list_id is not None and list_id != id:
+            raise TypeError("Pass either id= or list_id=, not both")
+        if id is None:
+            raise TypeError("Missing required argument: id")
+        data = await self._transport.aget(f"/articlelists/{id}")
         return ArticleList.model_validate(data)
 
     def add(self, *, list_id: int | str, body: dict[str, Any]) -> Article:

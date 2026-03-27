@@ -80,7 +80,8 @@ def test_repr_on_payment() -> None:
 
 
 def test_store_extra_fields() -> None:
-    data = {"id": 1, "name": "My Shop", "email": "shop@example.com", "prices_include_tax": True}
+    data = {"id": "store-1", "name": "My Shop", "email": "shop@example.com", "prices_include_tax": True}
     s = Store.model_validate(data)
+    assert s.id == "store-1"
     assert s.email == "shop@example.com"
     assert s.prices_include_tax is True

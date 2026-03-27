@@ -47,6 +47,32 @@ async def test_aget_article(client: ConnectClient) -> None:
 
 @respx.mock
 @pytest.mark.asyncio
+async def test_aget_article_supports_use_url_id(client: ConnectClient) -> None:
+    art = {"id": 42, "name": "Gadget", "uuid": "def-456"}
+    route = respx.get(f"{BASE}/articles/42").mock(
+        return_value=httpx.Response(200, json=art)
+    )
+    article = await client.articles.aget(article_id=42, use_url_id=True)
+    assert isinstance(article, Article)
+    assert article.id == 42
+    assert "use_url_id=true" in str(route.calls.last.request.url)
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_alist_articles_keeps_use_url_id_for_backward_compatibility(client: ConnectClient) -> None:
+    art = {"id": 1, "name": "Widget", "uuid": "abc-123"}
+    route = respx.get(f"{BASE}/articles").mock(
+        return_value=httpx.Response(200, json=[art])
+    )
+    page = await client.articles.alist(limit=1, use_url_id=True)
+    assert len(page.items) == 1
+    assert isinstance(page.items[0], Article)
+    assert "use_url_id=true" in str(route.calls.last.request.url)
+
+
+@respx.mock
+@pytest.mark.asyncio
 async def test_alist_customers_unwraps(client: ConnectClient) -> None:
     cust = {"id": "cust-uuid-1", "firstName": "Alice", "lastName": "Smith", "email": "alice@example.com"}
     respx.get(f"{BASE}/customers").mock(
@@ -92,12 +118,13 @@ async def test_alist_orders(client: ConnectClient) -> None:
 @pytest.mark.asyncio
 async def test_alist_payments_unwraps(client: ConnectClient) -> None:
     pay = {"id": "pay-uuid-1", "price": "10.00"}
-    respx.get(f"{BASE}/orders/1001/payments").mock(
+    route = respx.get(f"{BASE}/orders/1001/payments").mock(
         return_value=httpx.Response(200, json={"payments": [pay]})
     )
-    page = await client.orders.alist_payments(order_number=1001)
+    page = await client.orders.alist_payments(order_number=1001, embed="transactions")
     assert len(page.items) == 1
     assert isinstance(page.items[0], Payment)
+    assert "embed=transactions" in str(route.calls.last.request.url)
 
 
 @respx.mock
