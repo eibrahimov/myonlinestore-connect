@@ -22,6 +22,10 @@ class CategoriesResource(Resource):
         *,
         limit: int | None = None,
         offset: int | None = None,
+        created_start_date: str | None = None,
+        created_end_date: str | None = None,
+        changed_start_date: str | None = None,
+        changed_end_date: str | None = None,
         as_tree: bool | None = None,
         max_depth: int | None = None,
     ) -> PaginatedResponse[Category]:
@@ -36,7 +40,16 @@ class CategoriesResource(Resource):
         Returns:
             PaginatedResponse containing Category objects
         """
-        params = self._list_params(limit, offset, as_tree=as_tree, max_depth=max_depth)
+        params = self._list_params(
+            limit,
+            offset,
+            created_start_date=created_start_date,
+            created_end_date=created_end_date,
+            changed_start_date=changed_start_date,
+            changed_end_date=changed_end_date,
+            as_tree=as_tree,
+            max_depth=max_depth,
+        )
         data = self._transport.get("/categories", params=params)
         items = [Category.model_validate(item) for item in (data or [])]
         return PaginatedResponse(items=items, limit=limit if limit is not None else 50, offset=offset if offset is not None else 0)
@@ -46,6 +59,10 @@ class CategoriesResource(Resource):
         *,
         limit: int | None = None,
         offset: int | None = None,
+        created_start_date: str | None = None,
+        created_end_date: str | None = None,
+        changed_start_date: str | None = None,
+        changed_end_date: str | None = None,
         as_tree: bool | None = None,
         max_depth: int | None = None,
     ) -> PaginatedResponse[Category]:
@@ -60,7 +77,16 @@ class CategoriesResource(Resource):
         Returns:
             PaginatedResponse containing Category objects
         """
-        params = self._list_params(limit, offset, as_tree=as_tree, max_depth=max_depth)
+        params = self._list_params(
+            limit,
+            offset,
+            created_start_date=created_start_date,
+            created_end_date=created_end_date,
+            changed_start_date=changed_start_date,
+            changed_end_date=changed_end_date,
+            as_tree=as_tree,
+            max_depth=max_depth,
+        )
         data = await self._transport.aget("/categories", params=params)
         items = [Category.model_validate(item) for item in (data or [])]
         return PaginatedResponse(items=items, limit=limit if limit is not None else 50, offset=offset if offset is not None else 0)
@@ -89,22 +115,52 @@ class CategoriesResource(Resource):
         data = await self._transport.apost("/categories", json=body)
         return Category.model_validate(data)
 
-    def count(self) -> int:
+    def count(
+        self,
+        *,
+        created_start_date: str | None = None,
+        created_end_date: str | None = None,
+        changed_start_date: str | None = None,
+        changed_end_date: str | None = None,
+    ) -> int:
         """Get the total count of categories.
 
         Returns:
             Total number of categories.
         """
-        data = self._transport.get("/categories/count")
+        params = self._list_params(
+            None,
+            None,
+            created_start_date=created_start_date,
+            created_end_date=created_end_date,
+            changed_start_date=changed_start_date,
+            changed_end_date=changed_end_date,
+        )
+        data = self._transport.get("/categories/count", params=params)
         return CountResponse.model_validate(data).count
 
-    async def acount(self) -> int:
+    async def acount(
+        self,
+        *,
+        created_start_date: str | None = None,
+        created_end_date: str | None = None,
+        changed_start_date: str | None = None,
+        changed_end_date: str | None = None,
+    ) -> int:
         """Asynchronously get the total count of categories.
 
         Returns:
             Total number of categories.
         """
-        data = await self._transport.aget("/categories/count")
+        params = self._list_params(
+            None,
+            None,
+            created_start_date=created_start_date,
+            created_end_date=created_end_date,
+            changed_start_date=changed_start_date,
+            changed_end_date=changed_end_date,
+        )
+        data = await self._transport.aget("/categories/count", params=params)
         return CountResponse.model_validate(data).count
 
     def get(self, *, category_id: int | str) -> Category:
@@ -158,7 +214,7 @@ class CategoriesResource(Resource):
         return Category.model_validate(data)
 
     def list_articles(
-        self, *, category_id: int | str
+        self, *, category_id: int | str, limit: int | None = None, offset: int | None = None
     ) -> PaginatedResponse[ArticleLimited]:
         """List articles in a category.
 
@@ -171,12 +227,13 @@ class CategoriesResource(Resource):
         Returns:
             PaginatedResponse containing ArticleLimited objects
         """
-        data = self._transport.get(f"/categories/{category_id}/articles")
+        params = self._list_params(limit, offset)
+        data = self._transport.get(f"/categories/{category_id}/articles", params=params)
         items = [ArticleLimited.model_validate(item) for item in (data or [])]
-        return PaginatedResponse(items=items, limit=50, offset=0)
+        return PaginatedResponse(items=items, limit=limit if limit is not None else 50, offset=offset if offset is not None else 0)
 
     async def alist_articles(
-        self, *, category_id: int | str
+        self, *, category_id: int | str, limit: int | None = None, offset: int | None = None
     ) -> PaginatedResponse[ArticleLimited]:
         """Asynchronously list articles in a category.
 
@@ -189,6 +246,7 @@ class CategoriesResource(Resource):
         Returns:
             PaginatedResponse containing ArticleLimited objects
         """
-        data = await self._transport.aget(f"/categories/{category_id}/articles")
+        params = self._list_params(limit, offset)
+        data = await self._transport.aget(f"/categories/{category_id}/articles", params=params)
         items = [ArticleLimited.model_validate(item) for item in (data or [])]
-        return PaginatedResponse(items=items, limit=50, offset=0)
+        return PaginatedResponse(items=items, limit=limit if limit is not None else 50, offset=offset if offset is not None else 0)

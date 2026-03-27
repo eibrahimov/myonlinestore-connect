@@ -41,7 +41,8 @@ class ArticlesResource(Resource):
             changed_end_date: Filter by change date (end)
             ids: Filter by article IDs
             uuids: Filter by article UUIDs
-            use_url_id: Use URL ID instead of numeric ID
+            use_url_id: Compatibility-only flag retained for older SDK callers;
+                not documented for the current OpenAPI GET list endpoint
 
         Returns:
             PaginatedResponse containing Article objects
@@ -85,7 +86,8 @@ class ArticlesResource(Resource):
             changed_end_date: Filter by change date (end)
             ids: Filter by article IDs
             uuids: Filter by article UUIDs
-            use_url_id: Use URL ID instead of numeric ID
+            use_url_id: Compatibility-only flag retained for older SDK callers;
+                not documented for the current OpenAPI GET list endpoint
 
         Returns:
             PaginatedResponse containing Article objects
@@ -129,28 +131,32 @@ class ArticlesResource(Resource):
         data = await self._transport.apost("/articles", json=body)
         return Article.model_validate(data)
 
-    def get(self, *, article_id: int | str) -> Article:
+    def get(self, *, article_id: int | str, use_url_id: bool | None = None) -> Article:
         """Get an article by ID.
 
         Args:
             article_id: The article ID
+            use_url_id: Treat ``article_id`` as the article URL ID
 
         Returns:
             Article object
         """
-        data = self._transport.get(f"/articles/{article_id}")
+        params = self._list_params(None, None, use_url_id=use_url_id)
+        data = self._transport.get(f"/articles/{article_id}", params=params)
         return Article.model_validate(data)
 
-    async def aget(self, *, article_id: int | str) -> Article:
+    async def aget(self, *, article_id: int | str, use_url_id: bool | None = None) -> Article:
         """Asynchronously get an article by ID.
 
         Args:
             article_id: The article ID
+            use_url_id: Treat ``article_id`` as the article URL ID
 
         Returns:
             Article object
         """
-        data = await self._transport.aget(f"/articles/{article_id}")
+        params = self._list_params(None, None, use_url_id=use_url_id)
+        data = await self._transport.aget(f"/articles/{article_id}", params=params)
         return Article.model_validate(data)
 
     def update(self, *, article_id: int | str, body: dict[str, Any]) -> Article:
@@ -195,22 +201,52 @@ class ArticlesResource(Resource):
         """
         await self._transport.adelete(f"/articles/{article_id}")
 
-    def count(self) -> int:
+    def count(
+        self,
+        *,
+        created_start_date: str | None = None,
+        created_end_date: str | None = None,
+        changed_start_date: str | None = None,
+        changed_end_date: str | None = None,
+    ) -> int:
         """Get the total count of articles.
 
         Returns:
             Total number of articles.
         """
-        data = self._transport.get("/articles/count")
+        params = self._list_params(
+            None,
+            None,
+            created_start_date=created_start_date,
+            created_end_date=created_end_date,
+            changed_start_date=changed_start_date,
+            changed_end_date=changed_end_date,
+        )
+        data = self._transport.get("/articles/count", params=params)
         return CountResponse.model_validate(data).count
 
-    async def acount(self) -> int:
+    async def acount(
+        self,
+        *,
+        created_start_date: str | None = None,
+        created_end_date: str | None = None,
+        changed_start_date: str | None = None,
+        changed_end_date: str | None = None,
+    ) -> int:
         """Asynchronously get the total count of articles.
 
         Returns:
             Total number of articles.
         """
-        data = await self._transport.aget("/articles/count")
+        params = self._list_params(
+            None,
+            None,
+            created_start_date=created_start_date,
+            created_end_date=created_end_date,
+            changed_start_date=changed_start_date,
+            changed_end_date=changed_end_date,
+        )
+        data = await self._transport.aget("/articles/count", params=params)
         return CountResponse.model_validate(data).count
 
     def upload_image(

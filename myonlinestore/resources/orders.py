@@ -27,12 +27,12 @@ class OrdersResource(Resource):
         debtor_id: int | None = None,
         archived: bool | None = None,
         test: bool | None = None,
-        created_start_date: str | None = None,
-        created_end_date: str | None = None,
-        changed_start_date: str | None = None,
-        changed_end_date: str | None = None,
+        start_date: str | None = None,
+        end_date: str | None = None,
+        ordering: str | None = None,
         status_changed_start_date: str | None = None,
         status_changed_end_date: str | None = None,
+        **legacy_filters: Any,
     ) -> PaginatedResponse[Order]:
         """List orders.
 
@@ -54,6 +54,13 @@ class OrdersResource(Resource):
         Returns:
             PaginatedResponse containing Order objects
         """
+        created_start_date = legacy_filters.pop("created_start_date", None)
+        created_end_date = legacy_filters.pop("created_end_date", None)
+        changed_start_date = legacy_filters.pop("changed_start_date", None)
+        changed_end_date = legacy_filters.pop("changed_end_date", None)
+        if legacy_filters:
+            unexpected = ", ".join(sorted(legacy_filters))
+            raise TypeError(f"Unexpected keyword argument(s): {unexpected}")
         params = self._list_params(
             limit,
             offset,
@@ -62,8 +69,9 @@ class OrdersResource(Resource):
             debtor_id=debtor_id,
             archived=archived,
             test=test,
-            created_start_date=created_start_date,
-            created_end_date=created_end_date,
+            start_date=start_date if start_date is not None else created_start_date,
+            end_date=end_date if end_date is not None else created_end_date,
+            ordering=ordering,
             changed_start_date=changed_start_date,
             changed_end_date=changed_end_date,
             status_changed_start_date=status_changed_start_date,
@@ -83,12 +91,12 @@ class OrdersResource(Resource):
         debtor_id: int | None = None,
         archived: bool | None = None,
         test: bool | None = None,
-        created_start_date: str | None = None,
-        created_end_date: str | None = None,
-        changed_start_date: str | None = None,
-        changed_end_date: str | None = None,
+        start_date: str | None = None,
+        end_date: str | None = None,
+        ordering: str | None = None,
         status_changed_start_date: str | None = None,
         status_changed_end_date: str | None = None,
+        **legacy_filters: Any,
     ) -> PaginatedResponse[Order]:
         """Asynchronously list orders.
 
@@ -110,6 +118,13 @@ class OrdersResource(Resource):
         Returns:
             PaginatedResponse containing Order objects
         """
+        created_start_date = legacy_filters.pop("created_start_date", None)
+        created_end_date = legacy_filters.pop("created_end_date", None)
+        changed_start_date = legacy_filters.pop("changed_start_date", None)
+        changed_end_date = legacy_filters.pop("changed_end_date", None)
+        if legacy_filters:
+            unexpected = ", ".join(sorted(legacy_filters))
+            raise TypeError(f"Unexpected keyword argument(s): {unexpected}")
         params = self._list_params(
             limit,
             offset,
@@ -118,8 +133,9 @@ class OrdersResource(Resource):
             debtor_id=debtor_id,
             archived=archived,
             test=test,
-            created_start_date=created_start_date,
-            created_end_date=created_end_date,
+            start_date=start_date if start_date is not None else created_start_date,
+            end_date=end_date if end_date is not None else created_end_date,
+            ordering=ordering,
             changed_start_date=changed_start_date,
             changed_end_date=changed_end_date,
             status_changed_start_date=status_changed_start_date,
@@ -249,16 +265,13 @@ class OrdersResource(Resource):
         self,
         *,
         status_id: int | None = None,
-        debtor_email: str | None = None,
-        debtor_id: int | None = None,
         archived: bool | None = None,
         test: bool | None = None,
-        created_start_date: str | None = None,
-        created_end_date: str | None = None,
-        changed_start_date: str | None = None,
-        changed_end_date: str | None = None,
+        start_date: str | None = None,
+        end_date: str | None = None,
         status_changed_start_date: str | None = None,
         status_changed_end_date: str | None = None,
+        **legacy_filters: Any,
     ) -> int:
         """Get the total count of orders.
 
@@ -278,6 +291,15 @@ class OrdersResource(Resource):
         Returns:
             Total number of orders.
         """
+        debtor_email = legacy_filters.pop("debtor_email", None)
+        debtor_id = legacy_filters.pop("debtor_id", None)
+        created_start_date = legacy_filters.pop("created_start_date", None)
+        created_end_date = legacy_filters.pop("created_end_date", None)
+        changed_start_date = legacy_filters.pop("changed_start_date", None)
+        changed_end_date = legacy_filters.pop("changed_end_date", None)
+        if legacy_filters:
+            unexpected = ", ".join(sorted(legacy_filters))
+            raise TypeError(f"Unexpected keyword argument(s): {unexpected}")
         params = self._list_params(
             None,
             None,
@@ -286,8 +308,8 @@ class OrdersResource(Resource):
             debtor_id=debtor_id,
             archived=archived,
             test=test,
-            created_start_date=created_start_date,
-            created_end_date=created_end_date,
+            start_date=start_date if start_date is not None else created_start_date,
+            end_date=end_date if end_date is not None else created_end_date,
             changed_start_date=changed_start_date,
             changed_end_date=changed_end_date,
             status_changed_start_date=status_changed_start_date,
@@ -300,16 +322,13 @@ class OrdersResource(Resource):
         self,
         *,
         status_id: int | None = None,
-        debtor_email: str | None = None,
-        debtor_id: int | None = None,
         archived: bool | None = None,
         test: bool | None = None,
-        created_start_date: str | None = None,
-        created_end_date: str | None = None,
-        changed_start_date: str | None = None,
-        changed_end_date: str | None = None,
+        start_date: str | None = None,
+        end_date: str | None = None,
         status_changed_start_date: str | None = None,
         status_changed_end_date: str | None = None,
+        **legacy_filters: Any,
     ) -> int:
         """Asynchronously get the total count of orders.
 
@@ -329,6 +348,15 @@ class OrdersResource(Resource):
         Returns:
             Total number of orders.
         """
+        debtor_email = legacy_filters.pop("debtor_email", None)
+        debtor_id = legacy_filters.pop("debtor_id", None)
+        created_start_date = legacy_filters.pop("created_start_date", None)
+        created_end_date = legacy_filters.pop("created_end_date", None)
+        changed_start_date = legacy_filters.pop("changed_start_date", None)
+        changed_end_date = legacy_filters.pop("changed_end_date", None)
+        if legacy_filters:
+            unexpected = ", ".join(sorted(legacy_filters))
+            raise TypeError(f"Unexpected keyword argument(s): {unexpected}")
         params = self._list_params(
             None,
             None,
@@ -337,8 +365,8 @@ class OrdersResource(Resource):
             debtor_id=debtor_id,
             archived=archived,
             test=test,
-            created_start_date=created_start_date,
-            created_end_date=created_end_date,
+            start_date=start_date if start_date is not None else created_start_date,
+            end_date=end_date if end_date is not None else created_end_date,
             changed_start_date=changed_start_date,
             changed_end_date=changed_end_date,
             status_changed_start_date=status_changed_start_date,
@@ -372,33 +400,37 @@ class OrdersResource(Resource):
         return Order.model_validate(data)
 
     def list_payments(
-        self, *, order_number: int | str
+        self, *, order_number: int | str, embed: str | None = None
     ) -> PaginatedResponse[Payment]:
         """List payments for an order.
 
         Args:
             order_number: The order number
+            embed: Embed related resources in the payment response
 
         Returns:
             PaginatedResponse containing Payment objects
         """
-        data = self._transport.get(f"/orders/{order_number}/payments")
+        params = self._list_params(None, None, embed=embed)
+        data = self._transport.get(f"/orders/{order_number}/payments", params=params)
         raw = self._unwrap_list(data, "payments")
         items = [Payment.model_validate(item) for item in raw]
         return PaginatedResponse(items=items, limit=50, offset=0)
 
     async def alist_payments(
-        self, *, order_number: int | str
+        self, *, order_number: int | str, embed: str | None = None
     ) -> PaginatedResponse[Payment]:
         """Asynchronously list payments for an order.
 
         Args:
             order_number: The order number
+            embed: Embed related resources in the payment response
 
         Returns:
             PaginatedResponse containing Payment objects
         """
-        data = await self._transport.aget(f"/orders/{order_number}/payments")
+        params = self._list_params(None, None, embed=embed)
+        data = await self._transport.aget(f"/orders/{order_number}/payments", params=params)
         raw = self._unwrap_list(data, "payments")
         items = [Payment.model_validate(item) for item in raw]
         return PaginatedResponse(items=items, limit=50, offset=0)

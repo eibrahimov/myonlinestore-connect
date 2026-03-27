@@ -18,7 +18,13 @@ class DiscountCodesResource(Resource):
         super().__init__(transport)
 
     def list(
-        self, *, limit: int | None = None, offset: int | None = None
+        self,
+        *,
+        limit: int | None = None,
+        offset: int | None = None,
+        active: bool | None = None,
+        valid_start_date: str | None = None,
+        valid_end_date: str | None = None,
     ) -> PaginatedResponse[DiscountCode]:
         """List discount codes.
 
@@ -29,13 +35,25 @@ class DiscountCodesResource(Resource):
         Returns:
             PaginatedResponse containing DiscountCode objects
         """
-        params = self._list_params(limit, offset)
+        params = self._list_params(
+            limit,
+            offset,
+            active=active,
+            valid_start_date=valid_start_date,
+            valid_end_date=valid_end_date,
+        )
         data = self._transport.get("/discountcodes", params=params)
         items = [DiscountCode.model_validate(item) for item in (data or [])]
         return PaginatedResponse(items=items, limit=limit if limit is not None else 50, offset=offset if offset is not None else 0)
 
     async def alist(
-        self, *, limit: int | None = None, offset: int | None = None
+        self,
+        *,
+        limit: int | None = None,
+        offset: int | None = None,
+        active: bool | None = None,
+        valid_start_date: str | None = None,
+        valid_end_date: str | None = None,
     ) -> PaginatedResponse[DiscountCode]:
         """Asynchronously list discount codes.
 
@@ -46,7 +64,13 @@ class DiscountCodesResource(Resource):
         Returns:
             PaginatedResponse containing DiscountCode objects
         """
-        params = self._list_params(limit, offset)
+        params = self._list_params(
+            limit,
+            offset,
+            active=active,
+            valid_start_date=valid_start_date,
+            valid_end_date=valid_end_date,
+        )
         data = await self._transport.aget("/discountcodes", params=params)
         items = [DiscountCode.model_validate(item) for item in (data or [])]
         return PaginatedResponse(items=items, limit=limit if limit is not None else 50, offset=offset if offset is not None else 0)

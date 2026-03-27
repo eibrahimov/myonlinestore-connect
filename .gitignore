@@ -15,3 +15,14 @@ dist/
 build/
 *.egg-info/
 .DS_Store
+
+# Local secrets
+.env
+.env.*
+
+# Local analysis/docs artifacts
+analysis/
+external/
+
+# Local tooling lockfiles
+uv.lock
